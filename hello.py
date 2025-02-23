@@ -6,13 +6,18 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 # Start from product catalogue page with pagination parameter
-url = 'https://www.eurocontrol.int/what-we-offer?page=0'
+url = 'https://www.eurocontrol.int/what-we-offer?page='
 
 # Number of pages (could also be made dynamic)
-pages = 24
+pages = 25
+
+# Arrays we will store information
+plinks = []
+pnames = []
+pacts = []
 
 # Loop through all pages to fetch URLs of each product/tool
-for page in range(0,25):
+for page in range(0, pages):
     # GET request
     r = requests.get(url + str(page))
 
@@ -21,41 +26,34 @@ for page in range(0,25):
     content = soup.find('div', class_='card-deck')
 
     # Find the URL for each product/tool (excluding external links)
-    urls = []
     for a in content.find_all('a'):
-        if a.get('href').startswith('/'):
-            urls.append(a.get('href'))
-
-plinks = []
-pnames = []
-pacts = []
-
-# Fetch page info for each product/tool and add it to dataclass
-for url in urls:
-    # 1. Declare page link
-    link = 'https://www.eurocontrol.int' + url
-    plinks.append(link)
-    
-    # 2. Fetch relevant page content
-    pr = requests.get(link)
+        link = a.get('href')
+        if link.startswith('/'):
+            plinks.append('https://www.eurocontrol.int' + link)
+            
+# Fetch page info for each product/tool based on previously found URL
+for plink in plinks:
+    # 1. Fetch relevant page content
+    pr = requests.get(plink)
     psoup = BeautifulSoup(pr.content, 'html.parser')
-    
-    # 3. Find title
-    title =  psoup.find('h1').text
-    pnames.append(title)
+    print(plink)
+    # 2. Find title
+    #title = psoup.find('h1').text
+    #pnames.append(title)
 
-    # 4. Find activities - 0 to multiple
-    acts = []
-    allactlinks = psoup.find('div', class_ = 'content--header__second').find_all('a')
+    # 3. Find activities - 0 to multiple
+    #acts = []
+    #allactlinks = psoup.find('div', class_ = 'content--header__second').find_all('a')
 
-    for actlink in allactlinks:
-        acts.append(actlink.text)
+    #for actlink in allactlinks:
+    #    acts.append(actlink.text)
 
-    pacts.append(acts)
+    #pacts.append(acts)
 
 col1 = "Link"
-col2 = "Page title"
-col3 = "Activities"
+#col2 = "Page title"
+#col3 = "Activities"
 
-productsdf = pd.DataFrame({col1: plinks, col2: pnames, col3: pacts})
+#productsdf = pd.DataFrame({col1: plinks, col2: pnames, col3: pacts})
+productsdf = pd.DataFrame({col1: plinks})
 productsdf.to_excel("output.xlsx", sheet_name="From website", index=False)
