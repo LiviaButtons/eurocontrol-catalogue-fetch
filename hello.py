@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 # URL parse to fetch product type
 from urllib.parse import urlparse
-# Pandas for writing DataFrame & Excel
+# Pandas and openpyxl for dataframes and excel manipulation
 import pandas as pd
 # Random & time to add delays
 from random import randint
@@ -46,8 +46,8 @@ for page in range(0, pages):
             subtype = parsedlink.rpartition('/')[0]
             ptype.append(subtype)
             
-productsdf = pd.DataFrame({col1: plinks, col2: ptype})
-productsdf.to_excel("output.xlsx", sheet_name="From website", index=False)
+products_df = pd.DataFrame({col1: plinks, col2: ptype})
+products_df.to_excel("web-catalogue.xlsx", sheet_name="From website", index=False)
 
 # Fetch page info for each product/tool based on previously found URL
 for plink in plinks:
@@ -55,7 +55,7 @@ for plink in plinks:
     pr = requests.get(plink)
 
     # 2. Check for success
-    if pr.ok:
+    if pr.status_code == 200:
         psoup = BeautifulSoup(pr.content, 'html.parser')
 
         # 2.1 Find title
@@ -63,24 +63,25 @@ for plink in plinks:
         pnames.append(title)
 
         # 2.2. Find activities - 0 to multiple
-        acts = []
         allactlinks = psoup.find('div', class_ = 'content--header__second').find_all('a')
 
+        individual_acts = []
         for actlink in allactlinks:
-            acts.append(actlink.text)
-
-        pacts.append(acts)
-
-        # 2.3. Add line to Excel
-
+            individual_acts.append(actlink.text)
+        pacts.append(individual_acts)
+       
+        print('Page ' + title + ': success')
     else:
         # 3. If fail: print error
+        pnames.append(' ')
+        pacts.append(' ')
+        print('Page: ' + plink)
         print('Error: ' + pr.status_code)
 
     # Random naps to avoid getting blocked
     sleep(randint(1,5))
 
-productsdf[col2] = ptype
-productsdf[col3] = pnames
-productsdf[col4] = pacts
-productsdf.to_excel("webcatalogue.xlsx", sheet_name="From website", index=False)
+old_data_df = pd.read_excel("web-catalogue.xlsx")
+new_data_df = pd.DataFrame({col3: pnames, col4: pacts})
+df_combined = old_data_df.join(new_data_df, how="outer")
+df_combined.to_excel("web-catalogue.xlsx", sheet_name="From website", index=False)
