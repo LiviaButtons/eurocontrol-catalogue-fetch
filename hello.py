@@ -60,16 +60,19 @@ for plink in plinks:
 
         # 2.1 Find title
         title = psoup.find('h1').text
-        pnames.append(title)
+        pnames.append(title if title else 'error')
 
         # 2.2. Find activities - 0 to multiple
-        allactlinks = psoup.find('div', class_ = 'content--header__second').find_all('a')
+        header = psoup.find('div', class_ = 'content--header__second')
+        if header:
+            allactlinks = header.find_all('a')
+            individual_acts = []
+            for actlink in allactlinks:
+                individual_acts.append(actlink.text)
+            pacts.append(individual_acts)
+        else:
+            pacts.append('error')
 
-        individual_acts = []
-        for actlink in allactlinks:
-            individual_acts.append(actlink.text)
-        pacts.append(individual_acts)
-       
         print('Page ' + title + ': success')
     else:
         # 3. If fail: print error
@@ -79,7 +82,7 @@ for plink in plinks:
         print('Error: ' + pr.status_code)
 
     # Random naps to avoid getting blocked
-    sleep(randint(1,5))
+    sleep(randint(1,15))
 
 old_data_df = pd.read_excel("web-catalogue.xlsx")
 new_data_df = pd.DataFrame({col3: pnames, col4: pacts})
