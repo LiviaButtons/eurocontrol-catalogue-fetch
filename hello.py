@@ -59,7 +59,8 @@ for plink in plinks:
         psoup = BeautifulSoup(pr.content, 'html.parser')
 
         # 2.1 Find title
-        title = psoup.find('h1').text
+        h1text = psoup.find('h1').text
+        title = h1text.strip()
         pnames.append(title if title else 'error')
 
         # 2.2. Find activities - 0 to multiple
