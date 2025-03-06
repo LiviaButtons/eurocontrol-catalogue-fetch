@@ -30,16 +30,10 @@ for index, page in enumerate(pages):
         continue
 
     # Bools to determine when we are in the right place
-    is_service_page = False
-    is_beneficiary = False
-    is_availability = False
+    is_service_page, is_beneficiary, is_availability, is_pcode, is_category = False, False, False, False, False
 
     # Declare strings for easier concatenation (since info can be spread over multiple text blocks)
-    page_title = ''
-    page_beneficiaries = ''
-    page_availability = ''
-    page_pcode = ''
-    page_category = ''
+    page_title, page_beneficiaries, page_availability, page_pcode, page_category = '', '', '', '', ''
     
     # Fetch all text blocks on a page
     page_texts = page.find_all('LTTextBoxHorizontal')
@@ -51,17 +45,16 @@ for index, page in enumerate(pages):
            is_service_page = True
            break
         page_title += page_text.text
-    
-    c_titles.append(page_title)
-    print(page_title)
+
     # Ignore pages that aren't a service page
     if not is_service_page:
         continue
 
-    # Find beneficiaries - text found between "Beneficiaries" and "Availability"
+    # Find Beneficiaries - text found between "Beneficiaries" and "Availability"
     for page_text in page_texts:
         if page_text.text.startswith('Beneficiaries'):
             is_beneficiary = True
+            continue
 
         if page_text.text.startswith('Availability'):
             is_beneficiary = False
@@ -70,15 +63,11 @@ for index, page in enumerate(pages):
         if is_beneficiary:  
             page_beneficiaries += page_text.text
 
-    # /!\ clean up page title: some of them don't have white space
-    #final_page_title = page_title.split(' ', 1)
-    print('beneficiaries are: ' + page_beneficiaries)
-    c_beneficiaries.append(page_beneficiaries)
-
     # Find Availability - text found between "Availability" and "Product code"
     for page_text in page_texts:
         if page_text.text.startswith('Availability'):
             is_availability = True
+            continue
 
         if page_text.text.startswith('Product code'):
             is_availability = False
@@ -87,16 +76,37 @@ for index, page in enumerate(pages):
         if is_availability:  
             page_availability += page_text.text
 
-    print('Availability is: ' + page_availability)
-    c_availabilities.append(page_availability)
 
     # Find Product code - text between "Product code" and "EUROCONTROL PRODUCTS & SERVICES CATALOGUE"
-    # /!\ Products & services catalogue can have a page number before or after, so use contain instead of starts_with
+    # /!\ Products & services catalogue can have a page number before or after, so check for substring in string
+    for page_text in page_texts:
+        if page_text.text.startswith('Product code'):
+            is_pcode = True
+            continue
+
+        if 'EUROCONTROL PRODUCTS & SERVICES CATALOGUE' in page_text.text:
+            is_pcode = False
+            break
+
+        if is_pcode:  
+            page_pcode += page_text.text
 
     # Find Activity - text after EUROCONTROL PRODUCTS & SERVICES CATALOGUE
     # /!\ can be empty
 
-    # 
+    # Print outputs and place info in arrays
+    # /!\ clean up page title: some of them don't have white space
+    print('Page title is: ' + page_title)
+    #final_page_title = page_title.split(' ', 1)
+    c_titles.append(page_title)
+
+    print('Beneficiaries are: ' + page_beneficiaries)
+    c_beneficiaries.append(page_beneficiaries)
+
+    print('Availability is: ' + page_availability)
+    c_availabilities.append(page_availability)
+
+    print('Product code is: ' + page_pcode)
 
     # Find annotations - because they contain Links
     # /!\ can be multiple
@@ -105,5 +115,3 @@ for index, page in enumerate(pages):
         for annot in annots:
             urls = annot.get('URI')
             #print(urls)
-
-#print(pages)
