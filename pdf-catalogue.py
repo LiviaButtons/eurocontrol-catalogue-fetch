@@ -106,28 +106,34 @@ for index, page in enumerate(pages):
         if is_pcode:
             page_pcode += page_text.text
 
-    # Find Activity - only text after EUROCONTROL PRODUCTS & SERVICES CATALOGUE
-    # /!\ can be empty
-    for page_text in page_texts:
+    # Find category - only text after 'EUROCONTROL PRODUCTS & SERVICES CATALOGUE'
+    # /!\ can be empty - in that case, 'EUROCONTROL PROD...' is the last text item on page
+    for index, page_text in enumerate(page_texts):
         
-        print(page_text.text.find('EUROCONTROL PRODUCTS & SERVICES CATALOGUE'))
+        # If text is present
         if page_text.text.find('EUROCONTROL PRODUCTS & SERVICES CATALOGUE') >= 0:
-            print(page_text.text.find('EUROCONTROL PRODUCTS & SERVICES CATALOGUE'))
-            is_category = True
-            continue
-        
-        # If we're in the category section and it's not empty...
+            # If it's not the last text item, we're in category section - proceed
+            if index !=len(page_texts) -1:
+                is_category = True
+                continue
+            # If it is the last loop iteration, there is no text indicating category - so use previous
+            # This only works cause the first tool in a new category always has the category indicated, so the variable exists
+            else:
+                page_category += current_category
+
+        # If confirmed to be past 'EUROCONTROL PROD...' and there's still more text:
         if is_category:
+            # If it's not empty, add category & store in variable for later
             if len(page_text.get_text(strip=True)) > 0: 
                 page_category += page_text.text
-                print(len(page_text.get_text(strip=True)))
-                print(page_category)
+                current_category = page_text.text
                 break
+            # Else it's empty, use previous category as stored in variable
+            # This actually never happens
             else:
-                print(len(page_text.get_text(strip=True)))
-                page_category += 'Empty'
+                page_category += current_category
                 break
-    
+
     # Find annotations - because they contain links
     # /!\ can be multiple, but first one is usually the one
     annots = page.find_all('Annot')
@@ -151,18 +157,19 @@ for index, page in enumerate(pages):
     c_beneficiaries.append(page_beneficiaries)
 
     #print('Availability is: ' + page_availability)
+    # /!\ clean up - there's loads of fluff
     c_availability.append(page_availability)
 
     #print('Product code is: ' + page_pcode)
     c_pcode.append(page_pcode)
 
-    print('Category is: ' + page_category)
+    #print('Category is: ' + page_category)
     c_categories.append(page_category)
 
-    print('URL is: ' + page_url)
+    #print('URL is: ' + page_url)
     c_urls.append(page_url)
 
-# Build dataframe with all the info we obtained
+# Build dataframe with all the info we obtained and export to JSON and XLS
 pdf_catalogue_df = pd.DataFrame({col1: c_titles, col2: c_urls, col3: c_categories, col4: c_beneficiaries, col5: c_availability, col6: c_pcode})
 pdf_catalogue_df.to_excel("pdf-catalogue.xlsx", sheet_name="From website", index=False)
 pdf_catalogue_df.to_json("pdf-catalogue.json", orient="split", compression="infer", index="true")
