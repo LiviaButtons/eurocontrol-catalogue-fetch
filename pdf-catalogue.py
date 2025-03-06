@@ -89,9 +89,8 @@ for index, page in enumerate(pages):
             is_availability = False
             break
 
-        if is_availability:  
+        if is_availability:
             page_availability += page_text.text
-
 
     # Find Product code - text between "Product code" and "EUROCONTROL PRODUCTS & SERVICES CATALOGUE"
     # /!\ Products & services catalogue can have a page number before or after, so check for substring in string
@@ -104,27 +103,33 @@ for index, page in enumerate(pages):
             is_pcode = False
             break
 
-        if is_pcode:  
+        if is_pcode:
             page_pcode += page_text.text
 
     # Find Activity - only text after EUROCONTROL PRODUCTS & SERVICES CATALOGUE
     # /!\ can be empty
     for page_text in page_texts:
-        if 'EUROCONTROL PRODUCTS & SERVICES CATALOGUE' in page_text.text:
+        
+        print(page_text.text.find('EUROCONTROL PRODUCTS & SERVICES CATALOGUE'))
+        if page_text.text.find('EUROCONTROL PRODUCTS & SERVICES CATALOGUE') >= 0:
+            print(page_text.text.find('EUROCONTROL PRODUCTS & SERVICES CATALOGUE'))
             is_category = True
             continue
         
         # If we're in the category section and it's not empty...
-        if is_category and len(page_text.get_text(strip=True)) > 0: 
-            page_category += page_text.text
-            break
-
-        else:
-            page_category += 'Empty'
-            break
+        if is_category:
+            if len(page_text.get_text(strip=True)) > 0: 
+                page_category += page_text.text
+                print(len(page_text.get_text(strip=True)))
+                print(page_category)
+                break
+            else:
+                print(len(page_text.get_text(strip=True)))
+                page_category += 'Empty'
+                break
     
-    # Find annotations - because they contain Links
-    # /!\ can be multiple, but first one is it
+    # Find annotations - because they contain links
+    # /!\ can be multiple, but first one is usually the one
     annots = page.find_all('Annot')
     if annots:
         index, page in enumerate(pages)
@@ -138,18 +143,18 @@ for index, page in enumerate(pages):
     
     # Print outputs and place info in arrays
     # /!\ clean up page title: some of them don't have white space
-    print('Page title is: ' + page_title)
+    #print('Page title is: ' + page_title)
     #final_page_title = page_title.split(' ', 1)
     c_titles.append(page_title)
 
-    print('Beneficiaries are: ' + page_beneficiaries)
+    #print('Beneficiaries are: ' + page_beneficiaries)
     c_beneficiaries.append(page_beneficiaries)
 
-    print('Availability is: ' + page_availability)
+    #print('Availability is: ' + page_availability)
     c_availability.append(page_availability)
 
-    print('Product code is: ' + page_pcode)
-    c_pcode.append(page_category)
+    #print('Product code is: ' + page_pcode)
+    c_pcode.append(page_pcode)
 
     print('Category is: ' + page_category)
     c_categories.append(page_category)
