@@ -18,14 +18,8 @@ prodsurl = '/what-we-offer?page='
 pages = 25
 
 # Declaring variables for later
-plinks = []
-ptype = []
-pnames = []
-pacts = []
-col1 = "Link"
-col2 = "Type"
-col3 = "Page title"
-col4 = "Activities"
+plinks, ptype, pnames, pacts = [], [], [], []
+col1, col2, col3, col4 = "Link", "Type", "Page title", "Activities"
 
 # Loop through all pages to fetch URLs of each product/tool
 for page in range(0, pages):
