@@ -1,7 +1,7 @@
 # Module that makes HTTP requests to URL and returns response 
-import requests
+#import requests
 # PDF Reader to extract text of the PDF catalogue
-from pdfquery import PDFQuery
+#from pdfquery import PDFQuery
 # Pandas for easier analysis etc.
 #import pandas as pd
 # BeautifulSoup to read XML
@@ -14,21 +14,21 @@ base_url = 'https://www.eurocontrol.int'
 catalogue_page = 'https://www.eurocontrol.int/publication/eurocontrol-products-services-catalogue'
 
 # GET request to find lates edition of catalogue on publication page
-r = requests.get(catalogue_page)
-soup = BeautifulSoup(r.content, 'html.parser')
-target_link = soup.find('a', type="application/pdf").get('href')
-pdf_url = base_url + target_link
+#r = requests.get(catalogue_page)
+#soup = BeautifulSoup(r.content, 'html.parser')
+#target_link = soup.find('a', type="application/pdf").get('href')
+#pdf_url = base_url + target_link
 
 # Open and save the latest PDF catalogue
-pdf_response = requests.get(pdf_url)
-pdf = open(pdf_name, 'wb')
-pdf.write(pdf_response.content)
-pdf.close
+#pdf_response = requests.get(pdf_url)
+#pdf = open(pdf_name, 'wb')
+#pdf.write(pdf_response.content)
+#pdf.close
 
 # Load the PDF catalogue and convert it to XML for readability
-pdf = PDFQuery(pdf_name)
-pdf.load()
-pdf.tree.write(xml_name, pretty_print = True)
+#pdf = PDFQuery(pdf_name)
+#pdf.load()
+#pdf.tree.write(xml_name, pretty_print = True)
 
 # Reading data from the xml file, then parsing it with beautifulsoup
 with open(xml_name, 'r') as f:
