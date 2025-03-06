@@ -3,7 +3,7 @@
 # PDF Reader to extract text of the PDF catalogue
 #from pdfquery import PDFQuery
 # Pandas for easier analysis etc.
-#import pandas as pd
+import pandas as pd
 # BeautifulSoup to read XML
 from bs4 import BeautifulSoup
 
@@ -49,7 +49,7 @@ for index, page in enumerate(pages):
     # Bools to determine when we are in the right place
     is_service_page, is_beneficiary, is_availability, is_pcode, is_category = False, False, False, False, False
     # Strings for easier concatenation (since info can be spread over multiple text blocks)
-    page_title, page_beneficiaries, page_availability, page_pcode, page_category = '', '', '', '', ''
+    page_title, page_beneficiaries, page_availability, page_pcode, page_category, page_url = '', '', '', '', '', ''
     
     # Fetch all text blocks on a page
     page_texts = page.find_all('LTTextBoxHorizontal')
@@ -113,17 +113,29 @@ for index, page in enumerate(pages):
         if 'EUROCONTROL PRODUCTS & SERVICES CATALOGUE' in page_text.text:
             is_category = True
             continue
-
-        if len(page_text.get_text(strip=True)) > 0: 
+        
+        # If we're in the category section and it's not empty...
+        if is_category and len(page_text.get_text(strip=True)) > 0: 
             page_category += page_text.text
             break
 
-        #if is_category & not page_text.text.is_empty_element:  
-        #    page_category += page_text.text
         else:
             page_category += 'Empty'
             break
-
+    
+    # Find annotations - because they contain Links
+    # /!\ can be multiple, but first one is it
+    annots = page.find_all('Annot')
+    if annots:
+        index, page in enumerate(pages)
+        for annot in annots:
+            # /!\ a lot of the URLs erroneously start with mailto: so remove that
+            if annot.get('URI').startswith('mailto:'):
+                page_url = annot.get('URI').replace('mailto:', '')
+            else:
+                page_url = annot.get('URI')
+            break
+    
     # Print outputs and place info in arrays
     # /!\ clean up page title: some of them don't have white space
     print('Page title is: ' + page_title)
@@ -142,13 +154,10 @@ for index, page in enumerate(pages):
     print('Category is: ' + page_category)
     c_categories.append(page_category)
 
-    # Find annotations - because they contain Links
-    # /!\ can be multiple
-    annots = page.find_all('Annot')
-    if annots:
-        for annot in annots:
-            urls = annot.get('URI')
-            #print(urls)
+    print('URL is: ' + page_url)
+    c_urls.append(page_url)
 
 # Build dataframe with all the info we obtained
-#catalogue_df = pd.DataFrame({col1: c_titles, col2: c_urls, col3: c_categories, col4: c_beneficiaries, col5: c_availability, col6: c_pcode})
+pdf_catalogue_df = pd.DataFrame({col1: c_titles, col2: c_urls, col3: c_categories, col4: c_beneficiaries, col5: c_availability, col6: c_pcode})
+pdf_catalogue_df.to_excel("pdf-catalogue.xlsx", sheet_name="From website", index=False)
+pdf_catalogue_df.to_json("pdf-catalogue.json", orient="split", compression="infer", index="true")
