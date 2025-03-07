@@ -76,7 +76,7 @@ for plink in plinks:
         print('Error: ' + pr.status_code)
 
     # Random naps to avoid getting blocked
-    sleep(randint(1,15))
+    sleep(randint(1,5))
 
 old_data_df = pd.read_excel("web-catalogue.xlsx")
 new_data_df = pd.DataFrame({col3: pnames, col4: pacts})
