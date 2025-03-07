@@ -19,7 +19,7 @@ pages = 25
 
 # Declaring variables for later
 plinks, ptype, pnames, pacts = [], [], [], []
-col1, col2, col3, col4 = "Link", "Type", "Page title", "Activities"
+col1, col2, col3, col4 = 'Link', 'Type', 'Page title', 'Activities'
 
 # Loop through all pages to fetch URLs of each product/tool
 for page in range(0, pages):
@@ -41,7 +41,7 @@ for page in range(0, pages):
             ptype.append(subtype)
             
 products_df = pd.DataFrame({col1: plinks, col2: ptype})
-products_df.to_excel("web-catalogue.xlsx", sheet_name="From website", index=False)
+products_df.to_excel('web-catalogue.xlsx', sheet_name='From website', index=False)
 
 # Fetch page info for each product/tool based on previously found URL
 for plink in plinks:
@@ -78,8 +78,8 @@ for plink in plinks:
     # Random naps to avoid getting blocked
     sleep(randint(1,5))
 
-old_data_df = pd.read_excel("web-catalogue.xlsx")
+old_data_df = pd.read_excel('web-catalogue.xlsx')
 new_data_df = pd.DataFrame({col3: pnames, col4: pacts})
-df_combined = old_data_df.join(new_data_df, how="outer")
-df_combined.to_excel("web-catalogue.xlsx", sheet_name="From website", index=False)
-df_combined.to_json("web-catalogue.json", orient="split", compression="infer", index="true")
+df_combined = old_data_df.join(new_data_df, how='outer')
+df_combined.to_excel('web-catalogue.xlsx', sheet_name='From website', index=False)
+df_combined.to_json('web-catalogue.json', orient='split', compression='infer', index=False)

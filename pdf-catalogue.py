@@ -6,6 +6,8 @@
 import pandas as pd
 # BeautifulSoup to read XML
 from bs4 import BeautifulSoup
+# Re for cleaner output
+import re
 
 # Find latest edition of the catalogue on publication page
 pdf_name = 'nm-product-catalogue.pdf'
@@ -38,7 +40,7 @@ bs_data = BeautifulSoup(data, 'xml')
 # Declaring variables
 pages = bs_data.find_all('LTPage')
 c_titles, c_urls, c_categories, c_beneficiaries,  c_availability, c_pcode = [], [], [], [], [], []
-col1, col2, col3, col4, col5, col6 = 'Name', 'URL', 'Category', 'Beneficiaries', 'Availability', 'Product code'
+col1, col2, col3, col4, col5, col6 = 'Name', 'Link', 'Category', 'Beneficiaries', 'Availability', 'Product code'
 
 # Run through all pages with index
 for index, page in enumerate(pages):
@@ -125,8 +127,10 @@ for index, page in enumerate(pages):
         if is_category:
             # If it's not empty, add category & store in variable for later
             if len(page_text.get_text(strip=True)) > 0: 
-                page_category += page_text.text
-                current_category = page_text.text
+                # For cleaner output: split text (since category begins with N// ) and use only result
+                split_text = page_text.text.split(' ', 1)
+                page_category += split_text[1]
+                current_category = split_text[1]
                 break
             # Else it's empty, use previous category as stored in variable
             # This actually never happens
@@ -147,11 +151,24 @@ for index, page in enumerate(pages):
                 page_url = annot.get('URI')
             break
     
+
+    # /!\ clean up page title: starts with number, sometimes missing whitespace. First, split into components
+    split_title = re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', page_title)).split()
+    # Pop out first element
+    split_title.pop(0)
+    # Then add to string
+    s = ' '
+    final_title = s.join(split_title)
+
+    # /!\ this doesn't yet work
+    if '( ' in final_title:
+        final_title.replace('( ', '(')
+    elif '- ' in final_title:
+        final_title.replace('- ', '-')
+
     # Print outputs and place info in arrays
-    # /!\ clean up page title: some of them don't have white space
-    #print('Page title is: ' + page_title)
-    #final_page_title = page_title.split(' ', 1)
-    c_titles.append(page_title)
+    print(final_title)
+    c_titles.append(final_title)
 
     #print('Beneficiaries are: ' + page_beneficiaries)
     c_beneficiaries.append(page_beneficiaries)
@@ -171,5 +188,5 @@ for index, page in enumerate(pages):
 
 # Build dataframe with all the info we obtained and export to JSON and XLS
 pdf_catalogue_df = pd.DataFrame({col1: c_titles, col2: c_urls, col3: c_categories, col4: c_beneficiaries, col5: c_availability, col6: c_pcode})
-pdf_catalogue_df.to_excel("pdf-catalogue.xlsx", sheet_name="From website", index=False)
-pdf_catalogue_df.to_json("pdf-catalogue.json", orient="split", compression="infer", index="true")
+pdf_catalogue_df.to_excel('pdf-catalogue.xlsx', sheet_name='From website', index=False)
+pdf_catalogue_df.to_json('pdf-catalogue.json', orient='split', compression='infer', index=False)
