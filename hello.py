@@ -37,7 +37,7 @@ for page in range(0, pages):
             plinks.append(baseurl + link)
             # Find product type in URL
             parsedlink = urlparse(link).path
-            subtype = parsedlink.rpartition('/')[0]
+            subtype = parsedlink.rpartition('/')[0].replace('/', '')
             ptype.append(subtype)
             
 products_df = pd.DataFrame({col1: plinks, col2: ptype})
