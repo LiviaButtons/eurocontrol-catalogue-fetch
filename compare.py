@@ -1,5 +1,3 @@
-# Beautiful Soup
-from bs4 import BeautifulSoup
 # Previously exported all the data as JSON, so:
 import json
 # Panda for dataframe stuff
