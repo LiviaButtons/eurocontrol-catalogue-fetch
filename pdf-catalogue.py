@@ -159,12 +159,8 @@ for index, page in enumerate(pages):
     # Then add to string
     s = ' '
     final_title = s.join(split_title)
-
-    # /!\ this doesn't yet work
-    if '( ' in final_title:
-        final_title.replace('( ', '(')
-    elif '- ' in final_title:
-        final_title.replace('- ', '-')
+    final_title = final_title.replace('( ', '(').replace('- ', '-').replace(' -','-').replace('/ ', '/').replace(' /', '/')
+    
 
     # Print outputs and place info in arrays
     print(final_title)
