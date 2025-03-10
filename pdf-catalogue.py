@@ -140,15 +140,16 @@ for index, page in enumerate(pages):
 
     # Find annotations - because they contain links
     # /!\ can be multiple, but first one is usually the one
+    # /! trim whitespaces
     annots = page.find_all('Annot')
     if annots:
         index, page in enumerate(pages)
         for annot in annots:
             # /!\ a lot of the URLs erroneously start with mailto: so remove that
             if annot.get('URI').startswith('mailto:'):
-                page_url = annot.get('URI').replace('mailto:', '')
+                page_url = annot.get('URI').replace('mailto:', '').strip().replace('?subject=', '')
             else:
-                page_url = annot.get('URI')
+                page_url = annot.get('URI').strip()
             break
     
 
@@ -163,7 +164,7 @@ for index, page in enumerate(pages):
     
 
     # Print outputs and place info in arrays
-    print(final_title)
+    #print(final_title)
     c_titles.append(final_title)
 
     #print('Beneficiaries are: ' + page_beneficiaries)

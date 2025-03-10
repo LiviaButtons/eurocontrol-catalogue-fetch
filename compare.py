@@ -18,9 +18,6 @@ with open(pdf_catalogue_file, 'r') as secondfile:
 web_df = pd.read_json(web_catalogue_file, orient='split')
 pdf_df = pd.read_json(pdf_catalogue_file, orient='split')
 
-web_df.to_excel('test-web.xlsx', sheet_name='Sheet 1', index=False)
-pdf_df.to_excel('test-pdf.xlsx', sheet_name='Sheet 1', index=False)
-
 # Merging with outer join based on URL match
 complete_df = web_df.merge(pdf_df, on='Link', how='outer')
 complete_df.to_excel('complete-catalogue.xlsx', sheet_name='Sheet 1', index=False)
