@@ -14,13 +14,13 @@ with open(web_catalogue_file, 'r') as openfile:
 with open(pdf_catalogue_file, 'r') as secondfile:
     pdf_catalogue_object = json.load(secondfile)
 
-print(web_catalogue_object)
+# Place data into DataFrames to join/compare/manipulate more easilye
+web_df = pd.read_json(web_catalogue_file, orient='split')
+pdf_df = pd.read_json(pdf_catalogue_file, orient='split')
 
-# Place data into DataFrames to join/compare/manipulate more easily
-web_df = pd.DataFrame.from_dict(pd.json_normalize(web_catalogue_object), orient='columns')
-pdf_df = pd.DataFrame.from_dict(pd.json_normalize(pdf_catalogue_object), orient='columns')
+web_df.to_excel('test-web.xlsx', sheet_name='Sheet 1', index=False)
+pdf_df.to_excel('test-pdf.xlsx', sheet_name='Sheet 1', index=False)
 
 # Merging with outer join based on URL match
-#complete_df = web_df.merge(pdf_df, how='right')
-
-#complete_df.to_excel("complete-catalogue.xlsx", sheet_name="From website", index=False)
+complete_df = web_df.merge(pdf_df, on='Link', how='outer')
+complete_df.to_excel('complete-catalogue.xlsx', sheet_name='Sheet 1', index=False)
