@@ -17,10 +17,10 @@ with open(pdf_catalogue_file, 'r') as secondfile:
 print(web_catalogue_object)
 
 # Place data into DataFrames to join/compare/manipulate more easily
-web_df = pd.DataFrame(web_catalogue_object)
-pdf_df = pd.DataFrame(pdf_catalogue_object)
+web_df = pd.DataFrame.from_dict(pd.json_normalize(web_catalogue_object), orient='columns')
+pdf_df = pd.DataFrame.from_dict(pd.json_normalize(pdf_catalogue_object), orient='columns')
 
 # Merging with outer join based on URL match
-complete_df = web_df.merge(pdf_df, how='right', on='Link')
+#complete_df = web_df.merge(pdf_df, how='right')
 
-complete_df.to_excel("complete-catalogue.xlsx", sheet_name="From website", index=False)
+#complete_df.to_excel("complete-catalogue.xlsx", sheet_name="From website", index=False)
