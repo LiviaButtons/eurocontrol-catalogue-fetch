@@ -17,7 +17,7 @@ prodsurl = '/what-we-offer?page='
 # Number of pages (could also be made dynamic)
 pages = 25
 
-# Declaring variables for later
+# Declaring variables for later (web activity = pdf category)
 plinks, ptype, pnames, pacts = [], [], [], []
 col1, col2, col3, col4 = 'Link', 'Type', 'Page title', 'Activities'
 

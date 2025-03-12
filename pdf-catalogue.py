@@ -37,7 +37,7 @@ with open(xml_name, 'r') as f:
     data = f.read()
 bs_data = BeautifulSoup(data, 'xml')
 
-# Declaring variables
+# Declaring variables (pdf category = web activity...ish)
 pages = bs_data.find_all('LTPage')
 c_titles, c_urls, c_categories, c_beneficiaries,  c_availability, c_pcode = [], [], [], [], [], []
 col1, col2, col3, col4, col5, col6 = 'Name', 'Link', 'Category', 'Beneficiaries', 'Availability', 'Product code'
@@ -129,8 +129,9 @@ for index, page in enumerate(pages):
             if len(page_text.get_text(strip=True)) > 0: 
                 # For cleaner output: split text (since category begins with N// ) and use only result
                 split_text = page_text.text.split(' ', 1)
-                page_category += split_text[1]
-                current_category = split_text[1]
+                clean_category = split_text[1].capitalize()
+                page_category += clean_category
+                current_category = clean_category
                 break
             # Else it's empty, use previous category as stored in variable
             # This actually never happens
