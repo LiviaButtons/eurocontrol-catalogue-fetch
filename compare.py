@@ -43,6 +43,13 @@ for pdf_category in pdf_categories:
 #print(pdf_categories)
 print(all_categories)
 
+# = web_df[web_df.Activities == 'Safety']
+
+
+all_safety = web_df.loc[web_df['Activities'] == 'Safety']
+print(all_safety)
+print(web_df.loc[web_df['Activities'] == 'Safety'])
+
 # Step 2: match web catagories to PDF categories
 # Step 3: group elements by category if there's a match and add them to individual sheets on the excel.
 # Step 3.1: retain the rest of the info for each product
