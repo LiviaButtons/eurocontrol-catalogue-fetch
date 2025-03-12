@@ -140,16 +140,15 @@ for index, page in enumerate(pages):
 
     # Find annotations - because they contain links
     # /!\ can be multiple, but first one is usually the one
-    # /! trim whitespaces
+    # /! clean URLs, trim white spaces, ensure https
     annots = page.find_all('Annot')
     if annots:
         index, page in enumerate(pages)
         for annot in annots:
-            # /!\ a lot of the URLs erroneously start with mailto: so remove that
             if annot.get('URI').startswith('mailto:'):
                 page_url = annot.get('URI').replace('mailto:', '').strip().replace('?subject=', '')
             else:
-                page_url = annot.get('URI').strip()
+                page_url = annot.get('URI').strip().replace('http:', 'https:')
             break
     
 
