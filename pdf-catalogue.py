@@ -1,6 +1,6 @@
-# Module that makes HTTP requests to URL and returns response 
+# Module that makes HTTP requests to URL and returns response # TODO: uncomment if fetching latest catalogue
 #import requests
-# PDF Reader to extract text of the PDF catalogue
+# PDF Reader to extract text of the PDF catalogue # TODO: uncomment if fetching latest catalogue
 #from pdfquery import PDFQuery
 # Pandas for easier analysis etc.
 import pandas as pd
@@ -9,6 +9,8 @@ from bs4 import BeautifulSoup
 # Re for cleaner output
 import re
 
+# TODO: rebuild structure so that I'm not running 4 loops - build more concise conditions that tell me where on the page I am
+
 # Find latest edition of the catalogue on publication page
 pdf_name = 'nm-product-catalogue.pdf'
 xml_name = 'nm-product-catalogue.xml'
@@ -16,18 +18,21 @@ base_url = 'https://www.eurocontrol.int'
 catalogue_page = 'https://www.eurocontrol.int/publication/eurocontrol-products-services-catalogue'
 
 # GET request to find lates edition of catalogue on publication page
+# TODO: Uncomment this to fetch latest catalogue on website
 #r = requests.get(catalogue_page)
 #soup = BeautifulSoup(r.content, 'html.parser')
 #target_link = soup.find('a', type="application/pdf").get('href')
 #pdf_url = base_url + target_link
 
 # Open and save the latest PDF catalogue
+# TODO: Uncomment this to fetch latest catalogue on website
 #pdf_response = requests.get(pdf_url)
 #pdf = open(pdf_name, 'wb')
 #pdf.write(pdf_response.content)
 #pdf.close
 
 # Load the PDF catalogue and convert it to XML for readability
+# TODO: Uncomment this to fetch latest catalogue on website
 #pdf = PDFQuery(pdf_name)
 #pdf.load()
 #pdf.tree.write(xml_name, pretty_print = True)
@@ -160,6 +165,7 @@ for index, page in enumerate(pages):
     # Then add to string
     s = ' '
     final_title = s.join(split_title)
+    # Remove white spaces that add themselves around special characters
     final_title = final_title.replace('( ', '(').replace('- ', '-').replace(' -','-').replace('/ ', '/').replace(' /', '/')
     
 

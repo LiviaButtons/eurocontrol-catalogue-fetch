@@ -5,6 +5,7 @@ import pandas as pd
 
 web_catalogue_file = 'web-catalogue.json'
 pdf_catalogue_file = 'pdf-catalogue.json'
+final_catalogue_name = 'complete-catalogue.xlsx'
 
 with open(web_catalogue_file, 'r') as openfile:
     web_catalogue_object = json.load(openfile)
@@ -39,21 +40,25 @@ for pdf_category in pdf_categories:
     if not pdf_category in all_categories:
         all_categories.append(pdf_category)
 
-#print(web_categories)
-#print(pdf_categories)
-print(all_categories)
-
-# = web_df[web_df.Activities == 'Safety']
-
-
-all_safety = web_df.loc[web_df['Activities'] == 'Safety']
-print(all_safety)
-print(web_df.loc[web_df['Activities'] == 'Safety'])
-
 # Step 2: match web catagories to PDF categories
 # Step 3: group elements by category if there's a match and add them to individual sheets on the excel.
 # Step 3.1: retain the rest of the info for each product
 
 # Merging with outer join based on URL match
 complete_df = web_df.merge(pdf_df, on='Link', how='outer')
-complete_df.to_excel('complete-catalogue.xlsx', sheet_name='Sheet 1', index=False)
+
+# Then, peruse the complete DF to filter products based on category/activities
+# TODO: Build first the masks and then do it automatically?
+safety_mask1 = web_df.Activities.apply(lambda x: 'Safety' in x)
+safety_mask2 = complete_df.Category == 'Safety'
+
+# TODO: make this a loop to automatically go through all the masks
+# TODO: fix this because the mask breaks things currently
+all_safety_mask = web_df.Activities.apply(lambda x: 'Safety' in x) and complete_df.Category == 'Safety'
+all_safety = web_df[all_safety_mask]
+print(all_safety)
+
+# Then, write into singe Excel file with multiple sheets
+with pd.ExcelWriter('complete-catalogue.xlsx') as writer:
+    complete_df.to_excel(writer, sheet_name='Overview', index=False)
+    all_safety.to_excel(writer, sheet_name='Safety products', index=False)
